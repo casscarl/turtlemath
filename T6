@@ -1,0 +1,104 @@
+# Import necessary modules
+
+import turtle
+import math
+from svg_turtle import SvgTurtle
+
+# Define function for manipulating turtle path
+
+def line(turtle_obj, steps):
+  
+# create empty lists for writing data to
+
+  fw_list = []
+  turn1_list = []
+  x_y_list = []
+  direction_list = []
+
+  #initialize dictionary to receive data
+  telemetry_dict = {
+      'x_y_coords' : '',
+      'direction': '',
+      }
+
+  #create list of data determining step size and andgle
+
+  for i in range(steps):
+    telemetry_dict_list = []
+    #foreward step length
+    fw = .1
+    #function for determining angle
+    turn1 = (math.tan((i//2000)+2000))
+
+    #create lists variables
+    fw_list.append(fw)
+    turn1_list.append(turn1)
+
+
+  #iterate over step list
+  for j in range(steps):   
+     
+    #test to determine forward or back, up or down
+    if  fw_list[j] >= 0:
+      turtle_obj.fd(( fw_list[j]))
+    else:
+      turtle_obj.bk(( fw_list[j]))
+    
+    if turn1_list[j] >= 0:
+      turtle_obj.lt(turn1_list[j])
+    else:
+      turtle_obj.rt(turn1_list[j])
+
+    #put data in lists
+    x_y_list.append(turtle_obj.pos()) #gets a tuple of x,y coordinates
+    direction_list.append(turtle_obj.heading()) #get degree heading of turtle
+  
+
+
+  #populate dictionary
+  telemetry_dict['x_y_coords'] = x_y_list
+  #telemetry_dict['direction'] = direction_list
+
+  return telemetry_dict  
+
+  s = turtle.getscreen()
+turtle.clearscreen()
+turtle.screensize(1500, 1500)
+# set up SVGTurtle (requires pip install SVGTurtle)
+
+t1 = SvgTurtle( 1500, 1000 )
+t1.shape("circle")
+t1.turtlesize(.01)
+t1.pensize(.25)
+
+#change starting position and angle
+
+t1.penup()
+t1.goto(0, 0)
+#t1.right(90)
+t1.pendown()
+
+# run turtle using data create by the above function
+
+t1_path = line(t1, 2500000)
+
+# save svg file
+
+t1.save_as('17.svg')
+
+# Write the data to a dictionary
+
+draw_dict = {
+    'turtle_1': t1_path,}
+
+for turtle, telem_dict in draw_dict.items():
+  print(turtle)
+for category, data in telem_dict.items():
+    print(f'category: {category} | data: {data}')
+
+    # write dictionary to a Json file
+
+    import json
+with open("1.json", 'w') as json_obj:
+  json.dump(draw_dict, json_obj, indent=2)
+print('file written')
